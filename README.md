@@ -82,6 +82,12 @@ switchable `auto` agent, and — in LM Studio — auto-approval of the *sandboxe
 while the host shell stays gated. Two skills (`verify-work`, `task-discipline`) make the model
 verify its own work and recover from errors instead of needing a babysitter.
 
+**Safety net** — snapshot before a hands-off run, roll back if it misbehaves:
+```powershell
+./setup/checkpoint.ps1            # snapshot (commit + tag)
+./setup/checkpoint.ps1 -Rollback # restore it; add -Clean to also remove new files
+```
+
 **Full details + manual steps + headless/unattended operation:** [`docs/autonomy.md`](docs/autonomy.md).
 
 ## Examples

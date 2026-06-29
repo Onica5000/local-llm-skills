@@ -106,6 +106,22 @@ The `local-tools` primer and `AGENTS.md` both point the model at these.
   `defaultContextLength` in LM Studio (Settings) for autonomous sessions, and prefer the
   strongest local model (e.g. `qwen3.5-9b` / `qwen2.5-coder-7b`) for multi-step work.
 
+## Roll back a bad run (`checkpoint.ps1`)
+
+The safety net for hands-off work: snapshot the repo before the model runs, restore it in one
+command if the run goes wrong.
+
+```powershell
+./setup/checkpoint.ps1                      # snapshot current state (commit + tag)
+opencode run "do the task" --agent auto     # let it run
+# if it made a mess:
+./setup/checkpoint.ps1 -Rollback            # restore (asks first)
+./setup/checkpoint.ps1 -Rollback -Clean     # also delete files created during the run
+./setup/checkpoint.ps1 -List                # see saved checkpoints
+```
+A checkpoint is just a commit + a `checkpoint-<timestamp>` tag, so nothing exotic — you can also
+`git reset --hard <tag>` by hand. Not a git repo yet? `./setup/checkpoint.ps1 -Init` starts one.
+
 ## Safety notes
 
 - The deny-list is the safety net — keep it. Don't let a model route around a denied command.
