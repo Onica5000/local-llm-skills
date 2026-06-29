@@ -41,6 +41,50 @@ The standout piece: **`scan-tools.ps1` detects what's actually installed on *you
 and writes a personalized `local-tools` primer — so the model gets your real toolbox, your GPU's
 encoder, your shell, not someone else's.
 
+## Native tool plugins (better than the flaky web-search plugins)
+
+Skills are great, but for web search a **native tool** is better still — the model calls it
+directly, with no shell-command confirmation and structured results. This repo ships two,
+both keyless and dependency-light:
+
+| Plugin | For | Tools | Install |
+|---|---|---|---|
+| [`opencode/tool/websearch.ts`](opencode/tool/websearch.ts) | opencode | `websearch` | Copy to `~/.config/opencode/tool/` — **no build step** (opencode runs it natively) |
+| [`lmstudio-plugin/web-search-plus`](lmstudio-plugin/web-search-plus) | LM Studio | `web_search`, `fetch_url` | `npm install` then `lms dev --install -y` |
+
+**Why they're better:** the common web-search plugins `POST` to DuckDuckGo, which now returns
+an **HTTP 202 anti-bot page** (so they quietly return nothing). These use the **`GET`** endpoint
+that still works, fall back to the `lite` endpoint, decode DDG's redirect links, capture
+snippets, and — for LM Studio — add a `fetch_url` page-reader the others don't have.
+
+## Examples
+
+> _Tip: drop a screen recording at `docs/demo.gif` and it renders here._
+> `![demo](docs/demo.gif)`
+
+**LM Studio** — ask something that needs current info; the model calls the tools itself:
+```
+You:  What's the newest stable FFmpeg release and one notable change?
+  -> web_search("latest FFmpeg stable release 2026")
+  -> fetch_url("https://ffmpeg.org/download.html")
+Model: FFmpeg <x.y> "<name>" is current. Notable: <change>. (source: ffmpeg.org)
+```
+
+**opencode** — the `websearch` tool (or the `/websearch` command):
+```
+> /websearch amd rx 6600 ffmpeg hevc encoding flags
+1. Hardware/AMF - FFmpeg            https://trac.ffmpeg.org/wiki/Hardware/AMF
+2. Recommended FFmpeg Encoder ...   https://github.com/GPUOpen-LibrariesAndSDKs/AMF/...
+Model: Use -c:v hevc_amf with -rc cqp -qp_i 22 -qp_p 24 ... (source: trac.ffmpeg.org)
+```
+
+**Skills auto-loading** — no command needed; the model pulls the right skill on its own:
+```
+You:  convert intro.mov to a small h265 mp4 using my gpu
+  (model loads the media-ffmpeg skill, sees this PC = AMD)
+Model: ffmpeg -hwaccel d3d11va -i intro.mov -c:v hevc_amf -rc cqp -qp_i 22 ... out.mp4
+```
+
 ## Quick start
 
 1. **LM Studio:** install the *Skills* plugin (search the Hub for `skills`). opencode needs no plugin.

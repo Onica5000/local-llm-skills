@@ -1,6 +1,11 @@
 # Personal reinstall backup — local-only, never published (contains real machine paths)
 personal/
 
+# Node / plugin build artifacts
+node_modules/
+dist/
+.lmstudio/production.js
+
 # Python
 __pycache__/
 *.pyc

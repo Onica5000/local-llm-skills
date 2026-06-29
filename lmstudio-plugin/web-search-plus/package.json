@@ -1,0 +1,19 @@
+{
+  "name": "lms-plugin-web-search-plus",
+  "version": "1.0.0",
+  "description": "Keyless web search + page reader for LM Studio. Uses DuckDuckGo's GET endpoint (the reliable one) with a lite fallback, plus a fetch_url tool to read pages.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "lms dev",
+    "push": "lms push"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@lmstudio/sdk": "^1.5.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.8",
+    "typescript": "^5.9.3"
+  }
+}

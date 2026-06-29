@@ -1,0 +1,7 @@
+{
+  "type": "plugin",
+  "runner": "node",
+  "owner": "onica5000",
+  "name": "web-search-plus",
+  "revision": 1
+}

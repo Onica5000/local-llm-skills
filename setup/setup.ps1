@@ -67,7 +67,20 @@ if (Test-Path $ocSkill) {
   Write-Host "  [ok] opencode junction created -> $SkillsDir"
 }
 
-# 5. personalize the primer
+# 5. opencode native tool + /websearch command
+$ocTool = "$env:USERPROFILE\.config\opencode\tool"
+$ocCmd  = "$env:USERPROFILE\.config\opencode\command"
+New-Item -ItemType Directory -Force -Path $ocTool, $ocCmd | Out-Null
+Get-ChildItem (Join-Path $repo "opencode\tool") -Filter *.ts -ErrorAction SilentlyContinue | ForEach-Object {
+  Copy-Item $_.FullName -Destination $ocTool -Force
+}
+Get-ChildItem (Join-Path $repo "opencode\command") -Filter *.md -ErrorAction SilentlyContinue | ForEach-Object {
+  $t = (Get-Content $_.FullName -Raw).Replace('{{SKILLS_DIR}}', $SkillsDir)
+  Set-Content -Encoding utf8 (Join-Path $ocCmd $_.Name) $t
+}
+Write-Host "  [ok] opencode 'websearch' tool + /websearch command installed"
+
+# 6. personalize the primer
 if (-not $NoScan) {
   Write-Host "  Running scan-tools.ps1 to personalize local-tools..." -ForegroundColor Cyan
   & (Join-Path $PSScriptRoot "scan-tools.ps1") -SkillsDir $SkillsDir -ReferenceFile $ReferenceFile
@@ -76,3 +89,6 @@ if (-not $NoScan) {
 Write-Host ""
 Write-Host "Done. Restart LM Studio / open a new opencode session." -ForegroundColor Green
 Write-Host "Test it: ask your model 'what tools do I have for video encoding?'"
+Write-Host ""
+Write-Host "Optional - install the native LM Studio web-search plugin:" -ForegroundColor Cyan
+Write-Host "  cd '$repo\lmstudio-plugin\web-search-plus'; npm install; lms dev --install -y"
