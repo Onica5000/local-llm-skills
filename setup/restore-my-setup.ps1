@@ -44,7 +44,12 @@ Copy-Item "$personal\opencode\opencode.json"      -Destination "$ocDir\opencode.
 Copy-Item "$personal\opencode\AGENTS.md"          -Destination "$ocDir\AGENTS.md" -Force
 Copy-Item "$personal\opencode\opencode-mem.jsonc" -Destination "$ocDir\opencode-mem.jsonc" -Force
 Copy-Item "$personal\opencode\command\websearch.md" -Destination "$ocDir\command\websearch.md" -Force
-Write-Host "  [ok] opencode config restored"
+New-Item -ItemType Directory -Force -Path "$ocDir\agent", "$ocDir\tool" | Out-Null
+Copy-Item "$personal\opencode\agent\*.md" -Destination "$ocDir\agent\" -Force -ErrorAction SilentlyContinue
+Copy-Item "$personal\opencode\tool\*.ts" -Destination "$ocDir\tool\" -Force -ErrorAction SilentlyContinue
+Write-Host "  [ok] opencode config restored (incl. AGENTS.md, auto agent, websearch tool/command)"
+Write-Host "  note: opencode.json (with permission block) restored. For LM Studio auto-approve"
+Write-Host "        patterns, also run: ./setup/enable-autonomy.ps1"
 
 # 4. opencode -> lmstudio skills junction (single source of truth)
 $link = "$ocDir\skill"

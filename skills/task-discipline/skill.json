@@ -1,0 +1,5 @@
+{
+  "name": "task-discipline",
+  "description": "Load for any multi-step or long-running task you should complete autonomously. How to plan, keep a running checklist that survives a small context window, recover from errors without stalling, and decide when to proceed vs. stop and ask.",
+  "tags": ["plan", "planning", "checklist", "multi-step", "autonomy", "error recovery", "retry", "task", "workflow", "agent"]
+}

@@ -65,6 +65,25 @@ want higher-quality / higher-volume search, both plugins can use **Tavily** (fre
   key / instance URL in the plugin's **global** settings.
 - **opencode:** set an env var before launching — `TAVILY_API_KEY=...` or `SEARXNG_URL=https://...`.
 
+## Autonomy (work without constant approval)
+
+Small local models shouldn't get blanket "approve everything," so the kit uses **graduated
+autonomy**: auto-run anything read-only or reversible, gate only what's destructive or
+outward-facing.
+
+```powershell
+./setup/enable-autonomy.ps1     # applies it (idempotent; backs up what it edits)
+opencode --agent auto           # opencode's hands-off mode
+```
+
+This adds an opencode `permission` block (allow safe bash + edit/web, **deny** `rm`/`format`/
+`reset --hard`/force-push, **ask** for `git push`/installs), a graduated-autonomy `AGENTS.md`, a
+switchable `auto` agent, and — in LM Studio — auto-approval of the *sandboxed/read-only* tools
+while the host shell stays gated. Two skills (`verify-work`, `task-discipline`) make the model
+verify its own work and recover from errors instead of needing a babysitter.
+
+**Full details + manual steps + headless/unattended operation:** [`docs/autonomy.md`](docs/autonomy.md).
+
 ## Examples
 
 ![websearch demo](docs/demo.gif)

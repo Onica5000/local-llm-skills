@@ -47,8 +47,23 @@ domains, load that domain's skill for the exact commands.
 | Docker, containers, Kubernetes | `containers-k8s` |
 | SSH, curl, OpenSSL, certificates, networking | `network-crypto` |
 | Zip/7z/tar archives, robust file copy | `archives-files` |
+| Multi-step / long-running work, planning, error recovery | `task-discipline` |
+| Checking that a change actually worked before saying done | `verify-work` |
 
 If no skill matches, check the full reference file above (if present).
+
+---
+
+## Autonomy doctrine — work without constant approval
+
+Act on your own for routine, **reversible** work; stop only for the dangerous few.
+- **Just do it** (no asking): read/list/search files; edit or create files for the task; run
+  builds, linters, and **tests**; search the web; retry after fixing an error.
+- **Stop and ask** only for: deleting things you didn't create, other destructive/irreversible
+  acts, anything **outward-facing** (push/publish/send/deploy), and **installing software**.
+- **Verify before "done"** — run the check and read the result (load `verify-work`).
+- **Recover, don't stall** — on error, diagnose and retry up to 3 times (load `task-discipline`).
+- If a requirement is merely vague, pick the sensible default, state the assumption, and proceed.
 
 ---
 

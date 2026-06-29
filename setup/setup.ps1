@@ -92,3 +92,6 @@ Write-Host "Test it: ask your model 'what tools do I have for video encoding?'"
 Write-Host ""
 Write-Host "Optional - install the native LM Studio web-search plugin:" -ForegroundColor Cyan
 Write-Host "  cd '$repo\lmstudio-plugin\web-search-plus'; npm install; lms dev --install -y"
+Write-Host ""
+Write-Host "Optional - enable graduated autonomy (fewer approval prompts, safely):" -ForegroundColor Cyan
+Write-Host "  ./setup/enable-autonomy.ps1     (see docs/autonomy.md)"

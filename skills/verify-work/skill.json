@@ -1,0 +1,5 @@
+{
+  "name": "verify-work",
+  "description": "Load before declaring any task done. A checklist for actually verifying a change worked — running tests/linters/type-checks per language, re-reading edits, and confirming output — instead of assuming success.",
+  "tags": ["verify", "test", "check", "done", "validation", "lint", "typecheck", "quality", "confirm", "autonomy"]
+}
