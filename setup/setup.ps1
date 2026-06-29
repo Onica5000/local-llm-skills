@@ -78,7 +78,12 @@ Get-ChildItem (Join-Path $repo "opencode\command") -Filter *.md -ErrorAction Sil
   $t = (Get-Content $_.FullName -Raw).Replace('{{SKILLS_DIR}}', $SkillsDir)
   Set-Content -Encoding utf8 (Join-Path $ocCmd $_.Name) $t
 }
-Write-Host "  [ok] opencode 'websearch' tool + /websearch command installed"
+$ocAgent = "$env:USERPROFILE\.config\opencode\agent"
+New-Item -ItemType Directory -Force -Path $ocAgent | Out-Null
+Get-ChildItem (Join-Path $repo "opencode\agent") -Filter *.md -ErrorAction SilentlyContinue | ForEach-Object {
+  Copy-Item $_.FullName -Destination $ocAgent -Force
+}
+Write-Host "  [ok] opencode 'websearch' tool + /websearch command + agents (auto/coder/vision) installed"
 
 # 6. personalize the primer
 if (-not $NoScan) {

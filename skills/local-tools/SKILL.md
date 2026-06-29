@@ -39,6 +39,7 @@ domains, load that domain's skill for the exact commands.
 | Video/audio convert, encode, GPU encode, streaming | `media-ffmpeg` |
 | Audio editing, text-to-speech, voice cloning | `audio-sox-tts` |
 | Image convert/resize/edit, batch image processing | `images-magick-gimp` |
+| Understanding/reading an image (identify, OCR, describe) | `vision-image` |
 | Converting documents (md/docx/pdf/epub) | `documents-pandoc` |
 | Writing Python for media/ML (ffmpeg bindings, whisper, etc.) | `python-ml-libs` |
 | 3D render, video editing app, screen capture | `video-apps` |

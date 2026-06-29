@@ -1,6 +1,7 @@
 ---
 description: Fully autonomous mode - plans, executes, verifies, and finishes a task end to end without asking, stopping only for destructive or outward-facing actions.
 mode: primary
+model: lmstudio/qwen/qwen3.5-9b
 temperature: 0.2
 permission:
   edit: allow

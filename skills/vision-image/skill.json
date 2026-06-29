@@ -1,0 +1,5 @@
+{
+  "name": "vision-image",
+  "description": "Use to understand or read an IMAGE — identify electronic components from a photo, read/transcribe a schematic or label, OCR text, or describe a screenshot. Routes image work to the local vision model (qwen2.5-vl).",
+  "tags": ["vision", "image", "photo", "ocr", "describe image", "identify component", "schematic", "read label", "qwen2.5-vl", "screenshot", "look at"]
+}

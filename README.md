@@ -90,6 +90,17 @@ verify its own work and recover from errors instead of needing a babysitter.
 
 **Full details + manual steps + headless/unattended operation:** [`docs/autonomy.md`](docs/autonomy.md).
 
+## Health check & model routing
+
+```powershell
+./setup/doctor.ps1      # verify the whole setup is wired (skills, junction, plugin, tools, context)
+```
+
+Pick the right local model per task — small models are unreliable at tool calls. opencode ships
+per-task agents (`--agent auto` = general, `coder` = coding, `vision` = images), and there's a
+`vision-image` skill that routes image work (identify a component, OCR a schematic) to
+`qwen2.5-vl`. Full routing table + context-tuning guidance: [`docs/models.md`](docs/models.md).
+
 ## Examples
 
 ![websearch demo](docs/demo.gif)
