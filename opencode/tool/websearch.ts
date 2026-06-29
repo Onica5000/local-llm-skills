@@ -75,6 +75,36 @@ async function ddgLite(query: string, max: number, signal: AbortSignal): Promise
   return hits;
 }
 
+// Optional heavier-duty backends, enabled by env vars (else keyless DuckDuckGo is used):
+//   TAVILY_API_KEY=...     -> Tavily   |   SEARXNG_URL=https://...  -> SearXNG
+async function tavily(query: string, max: number, key: string, signal: AbortSignal): Promise<Hit[]> {
+  const res = await fetch("https://api.tavily.com/search", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({ query, max_results: max, search_depth: "basic" }),
+    signal,
+  });
+  if (!res.ok) throw new Error(`Tavily HTTP ${res.status}`);
+  const data: any = await res.json();
+  return (data.results ?? []).slice(0, max).map((r: any) => ({
+    title: String(r.title ?? ""),
+    url: String(r.url ?? ""),
+    snippet: clean(String(r.content ?? "")),
+  }));
+}
+
+async function searxng(query: string, max: number, baseUrl: string, signal: AbortSignal): Promise<Hit[]> {
+  const url = baseUrl.replace(/\/+$/, "") + "/search?" + new URLSearchParams({ q: query, format: "json", safesearch: "1" });
+  const res = await fetch(url, { headers: { "User-Agent": UA }, signal });
+  if (!res.ok) throw new Error(`SearXNG HTTP ${res.status}`);
+  const data: any = await res.json();
+  return (data.results ?? []).slice(0, max).map((r: any) => ({
+    title: String(r.title ?? ""),
+    url: String(r.url ?? ""),
+    snippet: clean(String(r.content ?? "")),
+  }));
+}
+
 export default tool({
   description:
     "Search the web (keyless, via DuckDuckGo) and return ranked results with title, URL, " +
@@ -94,10 +124,25 @@ export default tool({
   async execute(args, ctx) {
     const max = args.maxResults ?? 6;
     let hits: Hit[] = [];
+    let used = "duckduckgo";
+
+    // Optional premium backend via env var; falls back to DuckDuckGo on any failure.
+    const tavilyKey = process.env.TAVILY_API_KEY;
+    const searxngUrl = process.env.SEARXNG_URL;
     try {
-      hits = await ddgHtml(args.query, max, ctx.abort);
+      if (tavilyKey) { used = "tavily"; hits = await tavily(args.query, max, tavilyKey, ctx.abort); }
+      else if (searxngUrl) { used = "searxng"; hits = await searxng(args.query, max, searxngUrl, ctx.abort); }
     } catch {
-      /* fall through to lite */
+      hits = []; used = "duckduckgo"; // fall back to DDG below
+    }
+
+    if (hits.length === 0) {
+      used = "duckduckgo";
+      try {
+        hits = await ddgHtml(args.query, max, ctx.abort);
+      } catch {
+        /* fall through to lite */
+      }
     }
     if (hits.length === 0) {
       try {
@@ -113,9 +158,9 @@ export default tool({
       .map((h, i) => `${i + 1}. ${h.title}\n   ${h.url}${h.snippet ? `\n   ${h.snippet}` : ""}`)
       .join("\n\n");
     return {
-      title: `${hits.length} result(s) for "${args.query}"`,
+      title: `${hits.length} result(s) for "${args.query}" (via ${used})`,
       output: `Web results for "${args.query}":\n\n${body}\n\nRead a page with the webfetch tool, then cite the URL(s) you used.`,
-      metadata: { count: hits.length, results: hits },
+      metadata: { count: hits.length, backend: used, results: hits },
     };
   },
 });

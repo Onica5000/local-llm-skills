@@ -36,9 +36,16 @@ lms dev                   # hot-reloading dev server
 
 ## Config (in LM Studio plugin settings)
 
-- **Default results** (per-chat): how many results when unspecified (default 6).
+Per-chat:
+- **Search backend**: `DuckDuckGo` (keyless, default), `Tavily`, or `SearXNG`. If Tavily/SearXNG
+  is selected but not configured (or it fails), it falls back to DuckDuckGo automatically.
+- **Default results**: how many results when unspecified (default 6).
 - **Max characters when reading a page**: `fetch_url` truncation (default 6000).
-- **Request timeout (ms)** (global): default 12000.
+
+Global:
+- **Tavily API key**: needed only for the Tavily backend (free tier at tavily.com).
+- **SearXNG instance URL**: needed only for the SearXNG backend (JSON output enabled).
+- **Request timeout (ms)**: default 12000.
 
 ## License
 

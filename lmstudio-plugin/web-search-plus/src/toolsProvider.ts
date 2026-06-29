@@ -81,6 +81,43 @@ async function ddgLite(query: string, max: number, timeoutMs: number, signal: Ab
   return hits;
 }
 
+async function tavilySearch(query: string, max: number, apiKey: string, timeoutMs: number, signal: AbortSignal): Promise<Hit[]> {
+  const ctrl = new AbortController();
+  const onAbort = () => ctrl.abort();
+  signal.addEventListener("abort", onAbort, { once: true });
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch("https://api.tavily.com/search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({ query, max_results: max, search_depth: "basic" }),
+      signal: ctrl.signal,
+    });
+    if (!res.ok) throw new Error(`Tavily HTTP ${res.status}`);
+    const data: any = await res.json();
+    return (data.results ?? []).slice(0, max).map((r: any) => ({
+      title: String(r.title ?? ""),
+      url: String(r.url ?? ""),
+      snippet: clean(String(r.content ?? "")),
+    }));
+  } finally {
+    clearTimeout(timer);
+    signal.removeEventListener("abort", onAbort);
+  }
+}
+
+async function searxngSearch(query: string, max: number, baseUrl: string, timeoutMs: number, signal: AbortSignal): Promise<Hit[]> {
+  const url = baseUrl.replace(/\/+$/, "") + "/search?" + new URLSearchParams({ q: query, format: "json", safesearch: "1" });
+  const { status, body } = await fetchText(url, timeoutMs, signal);
+  if (status !== 200) throw new Error(`SearXNG HTTP ${status}`);
+  const data: any = JSON.parse(body);
+  return (data.results ?? []).slice(0, max).map((r: any) => ({
+    title: String(r.title ?? ""),
+    url: String(r.url ?? ""),
+    snippet: clean(String(r.content ?? "")),
+  }));
+}
+
 function pageToText(html: string, maxChars: number): string {
   let t = html.replace(/<(script|style|noscript)[^>]*>[\s\S]*?<\/\1>/gi, " ");
   t = t.replace(/<br\s*\/?>/gi, "\n").replace(/<\/(p|div|h[1-6]|li|tr)>/gi, "\n");
@@ -108,24 +145,47 @@ export async function toolsProvider(ctl: ToolsProviderController) {
     implementation: async ({ query, max_results }, ctx) => {
       const max = max_results ?? config.get("defaultMaxResults");
       const timeoutMs = global.get("requestTimeoutMs");
-      ctx.status(`Searching DuckDuckGo for "${query}"...`);
+      let backend = config.get("backend") as "duckduckgo" | "tavily" | "searxng";
       let hits: Hit[] = [];
-      try {
-        hits = await ddgHtml(query, max, timeoutMs, ctx.signal);
-      } catch (e) {
-        if (ctx.signal.aborted) return { error: "Search cancelled." };
-        ctx.warn(`Primary endpoint failed (${e instanceof Error ? e.message : e}); trying lite.`);
-      }
-      if (hits.length === 0 && !ctx.signal.aborted) {
-        try {
-          hits = await ddgLite(query, max, timeoutMs, ctx.signal);
-        } catch (e) {
-          return { error: `Web search failed: ${e instanceof Error ? e.message : String(e)}` };
+      let used = backend;
+
+      // Try the configured premium backend first (if it's set up).
+      if (backend === "tavily") {
+        const key = global.get("tavilyApiKey");
+        if (!key) { ctx.warn("Tavily selected but no API key set; using DuckDuckGo."); backend = "duckduckgo"; }
+        else {
+          ctx.status(`Searching Tavily for "${query}"...`);
+          try { hits = await tavilySearch(query, max, key, timeoutMs, ctx.signal); }
+          catch (e) { ctx.warn(`Tavily failed (${e instanceof Error ? e.message : e}); falling back to DuckDuckGo.`); backend = "duckduckgo"; }
+        }
+      } else if (backend === "searxng") {
+        const baseUrl = global.get("searxngUrl");
+        if (!baseUrl) { ctx.warn("SearXNG selected but no instance URL set; using DuckDuckGo."); backend = "duckduckgo"; }
+        else {
+          ctx.status(`Searching SearXNG for "${query}"...`);
+          try { hits = await searxngSearch(query, max, baseUrl, timeoutMs, ctx.signal); }
+          catch (e) { ctx.warn(`SearXNG failed (${e instanceof Error ? e.message : e}); falling back to DuckDuckGo.`); backend = "duckduckgo"; }
         }
       }
-      ctx.status(`${hits.length} result(s).`);
-      if (hits.length === 0) return { query, results: [], note: "No results; try fewer, more specific keywords." };
-      return { query, results: hits };
+
+      // DuckDuckGo path (default, or fallback): GET endpoint then lite.
+      if (hits.length === 0 && backend === "duckduckgo" && !ctx.signal.aborted) {
+        used = "duckduckgo";
+        ctx.status(`Searching DuckDuckGo for "${query}"...`);
+        try { hits = await ddgHtml(query, max, timeoutMs, ctx.signal); }
+        catch (e) {
+          if (ctx.signal.aborted) return { error: "Search cancelled." };
+          ctx.warn(`Primary endpoint failed (${e instanceof Error ? e.message : e}); trying lite.`);
+        }
+        if (hits.length === 0 && !ctx.signal.aborted) {
+          try { hits = await ddgLite(query, max, timeoutMs, ctx.signal); }
+          catch (e) { return { error: `Web search failed: ${e instanceof Error ? e.message : String(e)}` }; }
+        }
+      }
+
+      ctx.status(`${hits.length} result(s) via ${used}.`);
+      if (hits.length === 0) return { query, backend: used, results: [], note: "No results; try fewer, more specific keywords." };
+      return { query, backend: used, results: hits };
     },
   });
 
