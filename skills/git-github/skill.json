@@ -1,0 +1,6 @@
+﻿{
+  "name": "git-github",
+  "description": "Use for version control and GitHub operations â€” git (status/diff/branch/commit/log), git-lfs, tig (history TUI), and the gh CLI (PRs, issues, repos, releases, gists, Actions). Already authenticated as Onica5000.",
+  "tags": ["git", "github", "gh", "version control", "commit", "branch", "pull request", "pr", "issue", "release", "clone", "git-lfs", "tig"]
+}
+

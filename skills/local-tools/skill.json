@@ -1,0 +1,6 @@
+﻿{
+  "name": "local-tools",
+  "description": "Read FIRST whenever a task might need a command-line tool, program, or to run a script on this machine. Describes this Windows PC's identity, the critical PowerShell 5.1 rules you MUST follow, and a map of the other skills that cover each tool domain (media, audio, images, web search, installing tools, git, etc.).",
+  "tags": ["tools", "windows", "powershell", "shell", "cmd", "machine", "capabilities", "index", "what can you do"]
+}
+

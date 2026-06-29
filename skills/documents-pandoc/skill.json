@@ -1,0 +1,6 @@
+﻿{
+  "name": "documents-pandoc",
+  "description": "Use for converting documents between formats â€” Markdown, DOCX, PDF, HTML, EPUB, MOBI, ODT, etc. Pandoc for general docs, md2pdf for quick Markdown-to-PDF, Calibre for eBooks.",
+  "tags": ["pandoc", "document", "convert", "markdown", "docx", "pdf", "html", "epub", "mobi", "odt", "calibre", "ebook", "md2pdf"]
+}
+

@@ -1,0 +1,6 @@
+﻿{
+  "name": "python-ml-libs",
+  "description": "Use when a task needs Python for media or machine-learning work that CLI tools can't do easily â€” frame-accurate video, audio analysis, speech-to-text transcription, image generation, running Hugging Face models. Lists the libraries already installed (no pip needed).",
+  "tags": ["python", "machine learning", "transcription", "whisper", "speech to text", "transformers", "huggingface", "pyav", "librosa", "pillow", "matplotlib", "numpy"]
+}
+

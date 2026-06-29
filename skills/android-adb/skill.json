@@ -1,0 +1,6 @@
+﻿{
+  "name": "android-adb",
+  "description": "Use to inspect, debug, or control an Android phone from this PC â€” adb (shell, logcat, packages, diagnostics), fastboot (bootloader/recovery), and scrcpy (mirror & control the phone screen).",
+  "tags": ["android", "adb", "fastboot", "scrcpy", "phone", "logcat", "apk", "device", "mirror screen", "mobile"]
+}
+

@@ -1,0 +1,6 @@
+﻿{
+  "name": "web-search",
+  "description": "Use whenever you need current information from the internet, to look something up, verify a fact, find documentation, or read a web page. Provides a reliable keyless search command (no API key, no flaky plugin) plus a page-reader that returns clean text.",
+  "tags": ["web search", "search", "internet", "google", "duckduckgo", "look up", "fetch url", "read web page", "current information", "online"]
+}
+

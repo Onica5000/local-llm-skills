@@ -1,0 +1,6 @@
+﻿{
+  "name": "images-magick-gimp",
+  "description": "Use for image conversion, resizing, cropping, format changes, and batch image processing. ImageMagick for quick CLI jobs (GPU-accelerated), GIMP for advanced/scripted edits beyond ImageMagick.",
+  "tags": ["image", "magick", "imagemagick", "gimp", "resize", "convert", "crop", "png", "jpg", "heic", "batch", "thumbnail"]
+}
+

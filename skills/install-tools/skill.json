@@ -1,0 +1,6 @@
+﻿{
+  "name": "install-tools",
+  "description": "Use when a needed command-line tool, app, language, or library is MISSING and you need to download/install it on this Windows machine. Covers checking whether something is installed, then picking the right package manager (winget, choco, scoop, pip/uv, npm, cargo) and verifying the install.",
+  "tags": ["install", "download", "winget", "choco", "scoop", "pip", "uv", "npm", "cargo", "package manager", "missing tool", "setup"]
+}
+

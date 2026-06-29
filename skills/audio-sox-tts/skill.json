@@ -1,0 +1,6 @@
+﻿{
+  "name": "audio-sox-tts",
+  "description": "Use for audio editing (convert, trim, merge, normalize, effects, generate tones) with SoX, and for text-to-speech / voice cloning with XTTS-v2 (local) or edge-tts (fast online).",
+  "tags": ["sox", "audio", "tts", "text to speech", "voice cloning", "xtts", "edge-tts", "normalize", "trim audio", "synthesize", "speech"]
+}
+

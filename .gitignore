@@ -1,0 +1,14 @@
+# Personal reinstall backup — local-only, never published (contains real machine paths)
+personal/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Editor
+.vscode/
+.idea/

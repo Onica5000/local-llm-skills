@@ -1,0 +1,6 @@
+﻿{
+  "name": "media-ffmpeg",
+  "description": "Use for any video or audio conversion, encoding, transcoding, trimming, extracting, streaming, or inspecting media files. Covers FFmpeg/ffprobe/ffplay including GPU hardware encoding (NVIDIA/AMD/Intel).",
+  "tags": ["ffmpeg", "ffprobe", "video", "audio", "convert", "encode", "transcode", "trim", "gpu", "hevc", "h264", "av1", "nvenc", "amf", "qsv", "media"]
+}
+

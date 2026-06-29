@@ -1,0 +1,6 @@
+﻿{
+  "name": "video-apps",
+  "description": "Use to drive the big GUI media apps headlessly from the shell â€” VLC (play/transcode/stream/snapshot), Blender (3D render, video sequencer), OBS (screen capture/record), DaVinci Resolve (pro edit/color). Reach here for things the CLI tools can't do (3D, compositing, screen capture, color grading).",
+  "tags": ["vlc", "blender", "obs", "davinci resolve", "3d render", "screen capture", "record", "stream", "color grading", "video editing", "headless"]
+}
+

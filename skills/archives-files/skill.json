@@ -1,0 +1,6 @@
+﻿{
+  "name": "archives-files",
+  "description": "Use for compressing/extracting archives (7z, zip, tar, gz, rar) and for robust file copying, mirroring, and bulk file operations with 7-Zip, tar, robocopy, and xcopy.",
+  "tags": ["7z", "7-zip", "zip", "tar", "gzip", "rar", "compress", "extract", "archive", "robocopy", "xcopy", "copy", "mirror", "backup"]
+}
+

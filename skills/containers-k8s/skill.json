@@ -1,0 +1,6 @@
+﻿{
+  "name": "containers-k8s",
+  "description": "Use for Docker and Kubernetes work â€” building/running/managing containers (docker, docker-compose) and managing clusters (kubectl). Also covers QEMU VMs and WSL for Linux.",
+  "tags": ["docker", "container", "compose", "kubernetes", "kubectl", "k8s", "image", "qemu", "vm", "wsl"]
+}
+

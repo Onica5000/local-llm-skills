@@ -1,0 +1,6 @@
+﻿{
+  "name": "network-crypto",
+  "description": "Use for HTTP requests, SSH/SCP/SFTP remote access, key generation, TLS certificates, hashing, and encryption with curl, OpenSSH, and OpenSSL. Plus built-in Windows networking (netsh, ipconfig).",
+  "tags": ["curl", "http", "api", "ssh", "scp", "sftp", "openssl", "tls", "certificate", "hash", "encrypt", "ssh-keygen", "network", "ipconfig"]
+}
+
