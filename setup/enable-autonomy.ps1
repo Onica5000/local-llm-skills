@@ -23,9 +23,12 @@ if (Test-Path $ocJson) {
   Backup $ocJson
   $j = Get-Content $ocJson -Raw | ConvertFrom-Json
   $bash = [ordered]@{
-    "*" = "allow"; "rm *" = "deny"; "rm -rf*" = "deny"; "rmdir *" = "deny"; "del *" = "deny"
-    "Remove-Item*" = "deny"; "format *" = "deny"; "diskpart*" = "deny"
-    "git reset --hard*" = "deny"; "git clean*" = "deny"; "git push --force*" = "deny"
+    "*" = "allow"
+    "rm *" = "deny"; "rm -rf*" = "deny"; "rmdir *" = "deny"; "rd *" = "deny"; "del *" = "deny"; "erase *" = "deny"
+    "Remove-Item*" = "deny"; "Clear-Content*" = "deny"
+    "format *" = "deny"; "diskpart*" = "deny"; "bcdedit*" = "deny"; "dd *" = "deny"; "mkfs*" = "deny"; "cipher /w*" = "deny"
+    "reg delete*" = "deny"; "reg.exe delete*" = "deny"; "sc delete*" = "deny"; "schtasks /delete*" = "deny"; "shutdown*" = "deny"
+    "git reset --hard*" = "deny"; "git clean*" = "deny"; "git push --force*" = "deny"; "gh repo delete*" = "deny"
     "git push*" = "ask"; "winget install*" = "ask"; "choco install*" = "ask"
     "npm install -g*" = "ask"; "scoop install*" = "ask"
   }

@@ -172,10 +172,14 @@ export async function toolsProvider(ctl: ToolsProviderController) {
       if (hits.length === 0 && backend === "duckduckgo" && !ctx.signal.aborted) {
         used = "duckduckgo";
         ctx.status(`Searching DuckDuckGo for "${query}"...`);
-        try { hits = await ddgHtml(query, max, timeoutMs, ctx.signal); }
-        catch (e) {
-          if (ctx.signal.aborted) return { error: "Search cancelled." };
-          ctx.warn(`Primary endpoint failed (${e instanceof Error ? e.message : e}); trying lite.`);
+        // retry with backoff to ride out transient rate-limits
+        for (let attempt = 0; attempt < 3 && hits.length === 0; attempt++) {
+          try { hits = await ddgHtml(query, max, timeoutMs, ctx.signal); }
+          catch (e) {
+            if (ctx.signal.aborted) return { error: "Search cancelled." };
+            ctx.warn(`Primary attempt ${attempt + 1} failed (${e instanceof Error ? e.message : e}).`);
+          }
+          if (hits.length === 0 && attempt < 2) await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)));
         }
         if (hits.length === 0 && !ctx.signal.aborted) {
           try { hits = await ddgLite(query, max, timeoutMs, ctx.signal); }

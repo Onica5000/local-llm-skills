@@ -20,6 +20,7 @@ import re
 import json
 import html
 import gzip
+import time
 import argparse
 import urllib.parse
 import urllib.request
@@ -70,48 +71,56 @@ def _decode_ddg_link(href):
     return href
 
 
+def _ddg_html(query, n):
+    """DuckDuckGo HTML endpoint (GET — the POST form returns an anti-bot 202)."""
+    url = "https://html.duckduckgo.com/html/?" + urllib.parse.urlencode({"q": query})
+    body = _get(url)
+    out = []
+    for m in re.finditer(r'<a[^>]+class="result__a"[^>]+href="([^"]+)"[^>]*>(.*?)</a>', body, re.S):
+        link = _decode_ddg_link(html.unescape(m.group(1)))
+        if not link.startswith("http"):
+            continue
+        # snippet sits ~1500 chars after the title link; scan a window for it
+        after = body[m.end():m.end() + 3000]
+        sn = re.search(r'class="result__snippet"[^>]*>(.*?)</a>', after, re.S)
+        out.append({"title": _clean(m.group(2)), "url": link, "snippet": _clean(sn.group(1)) if sn else ""})
+        if len(out) >= n:
+            break
+    return out
+
+
+def _ddg_lite(query, n):
+    """Lite endpoint fallback (rel=nofollow uddg links)."""
+    url = "https://lite.duckduckgo.com/lite/?" + urllib.parse.urlencode({"q": query})
+    body = _get(url)
+    out = []
+    for m in re.finditer(r'<a[^>]+rel="nofollow"[^>]+href="([^"]+uddg=[^"]+)"[^>]*>(.*?)</a>', body, re.S):
+        link = _decode_ddg_link(html.unescape(m.group(1)))
+        if link.startswith("http"):
+            out.append({"title": _clean(m.group(2)), "url": link, "snippet": ""})
+        if len(out) >= n:
+            break
+    return out
+
+
 def search(query, n=6):
-    """Return a list of {title, url, snippet} dicts."""
-    results = []
-
-    # --- Primary: html.duckduckgo.com ---
-    try:
-        url = "https://html.duckduckgo.com/html/?" + urllib.parse.urlencode({"q": query})
-        body = _get(url)
-        blocks = re.findall(
-            r'<a[^>]+class="result__a"[^>]+href="([^"]+)"[^>]*>(.*?)</a>'
-            r'.*?(?:class="result__snippet"[^>]*>(.*?)</a>)?',
-            body, re.S)
-        for href, title, snippet in blocks:
-            results.append({
-                "title": _clean(title),
-                "url": _decode_ddg_link(html.unescape(href)),
-                "snippet": _clean(snippet or ""),
-            })
-            if len(results) >= n:
-                break
-    except Exception as e:  # noqa: BLE001
-        sys.stderr.write(f"[primary endpoint failed: {e}]\n")
-
-    # --- Fallback: lite.duckduckgo.com ---
-    if not results:
+    """Return a list of {title, url, snippet} dicts, with backoff + lite fallback."""
+    # Primary endpoint, retried with backoff to ride out transient rate-limits.
+    for attempt in range(3):
         try:
-            url = "https://lite.duckduckgo.com/lite/?" + urllib.parse.urlencode({"q": query})
-            body = _get(url)
-            for href, title in re.findall(
-                    r'<a[^>]+class="result-link"[^>]+href="([^"]+)"[^>]*>(.*?)</a>',
-                    body, re.S):
-                results.append({
-                    "title": _clean(title),
-                    "url": _decode_ddg_link(html.unescape(href)),
-                    "snippet": "",
-                })
-                if len(results) >= n:
-                    break
+            hits = _ddg_html(query, n)
+            if hits:
+                return hits[:n]
         except Exception as e:  # noqa: BLE001
-            sys.stderr.write(f"[fallback endpoint failed: {e}]\n")
-
-    return results[:n]
+            sys.stderr.write(f"[primary attempt {attempt + 1} failed: {e}]\n")
+        if attempt < 2:
+            time.sleep(1.5 * (attempt + 1))  # 1.5s, then 3s
+    # Fallback endpoint
+    try:
+        return _ddg_lite(query, n)[:n]
+    except Exception as e:  # noqa: BLE001
+        sys.stderr.write(f"[fallback endpoint failed: {e}]\n")
+    return []
 
 
 def fetch(url, max_chars=6000):

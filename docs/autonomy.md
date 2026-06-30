@@ -69,7 +69,7 @@ whitelist **per tool** (no per-command patterns). So we auto-approve the tools t
 |---|---|
 | `onica5000/web-search-plus:*` | read-only web search |
 | `khtsly/skills:*` | just reads skill files |
-| `khtsly/computer:*` | runs in an **isolated Docker container**, not the host |
+| `khtsly/computer:*` | runs in a **Docker container** (can't touch the host; note: it has network access — see Safety notes) |
 | `lmstudio/js-code-sandbox:*` | **isolated** JS sandbox |
 | `lmstudio/rag-v1:*` | read-only document retrieval |
 
@@ -124,6 +124,15 @@ A checkpoint is just a commit + a `checkpoint-<timestamp>` tag, so nothing exoti
 
 ## Safety notes
 
-- The deny-list is the safety net — keep it. Don't let a model route around a denied command.
-- Run autonomous work inside a **git repo / scoped working dir** so mistakes are recoverable.
-- Revert everything: restore the `*.bak-autonomy` files this setup created.
+- **The deny-list is best-effort, not a sandbox.** It blocks the destructive commands it lists,
+  but it's allow-by-default: an unlisted destructive command, or one hidden in a chain
+  (`foo; rm bar`) or a redirect (`> important.txt`), can still run. Treat it as a guardrail, not
+  a cage.
+- **The real safety net is recoverability:** run autonomous work inside a **git repo** and take a
+  `checkpoint.ps1` snapshot first, or run in a throwaway VM/container. Then any miss is undoable.
+- **`khtsly/computer` is host-safe, not risk-free.** It's a Docker sandbox so it can't touch your
+  host, but it *does* have network access — a confused or prompt-injected model could install
+  packages or reach the internet from inside it. If that matters, keep it gated or disable its
+  container networking.
+- Don't let a model route around a denied command. Revert this setup by restoring the
+  `*.bak-autonomy` files it created.

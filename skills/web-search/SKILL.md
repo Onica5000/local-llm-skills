@@ -1,45 +1,32 @@
-﻿---
+---
 name: web-search
-description: Use whenever you need current information from the internet, to look something up, verify a fact, find documentation, or read a web page. Provides a reliable keyless search command (no API key, no flaky plugin) plus a page-reader that returns clean text.
+description: Use whenever you need current information from the internet, to look something up, verify a fact, find documentation, or read a web page. Prefer the dedicated web-search tool if one is available; a keyless script is the fallback.
 ---
 
 # web-search
 
-This machine has a self-contained web search tool. It needs **no API key** and does not
-depend on any plugin. It runs DuckDuckGo under the hood and can also fetch a page and
-return it as plain text so you can read it.
+Pick the best available method — they all hit DuckDuckGo (keyless) under the hood.
 
-Script location:
-`{{SKILLS_DIR}}\web-search\scripts\web_search.py`
+## 1. Preferred: a dedicated web-search TOOL (no approval prompt)
+If you have a tool you can call directly, use it — it's the smoothest path:
+- **LM Studio:** the `web_search` tool (search) and `fetch_url` tool (read a page) from the
+  *web-search-plus* plugin. Call them directly.
+- **opencode:** the `websearch` tool (search) and the built-in `webfetch` tool (read a page).
 
-## Search the web
+Call the search tool first, then read the most relevant 1-2 results with the fetch/read tool
+before answering. Always cite the URLs you used.
+
+## 2. Fallback: the keyless script (when no tool is available)
+If neither tool exists in this environment, run the bundled script (note: on this machine the
+host shell may ask for confirmation):
 ```powershell
-python "{{SKILLS_DIR}}\web-search\scripts\web_search.py" "your query here"
-```
-Returns a numbered list of titles, URLs, and snippets. Use `-n 8` to get more results.
-
-## Read a specific page (turn a URL into readable text)
-```powershell
+python "{{SKILLS_DIR}}\web-search\scripts\web_search.py" "your query"
 python "{{SKILLS_DIR}}\web-search\scripts\web_search.py" --fetch "https://example.com/article"
 ```
-Returns the page stripped to plain text (truncated to ~6000 chars).
 
-## JSON output (when you need to parse results in code)
-```powershell
-python "{{SKILLS_DIR}}\web-search\scripts\web_search.py" "query" --json
-```
-
-## Typical workflow
-1. **Search** for the question to get candidate URLs.
-2. Pick the most relevant 1â€“2 results.
-3. **`--fetch`** those URLs to read the actual content before answering.
-4. Cite the URL(s) you used in your answer.
-
-## Notes
-- Always `--fetch` a result before stating a fact from it â€” snippets are short and can be
-  misleading. Read the page.
-- If you get "No results", rephrase the query (fewer, more specific keywords) and retry once.
-- This uses `python` (Python 3.14 at `C:\Python314`). If `python` isn't found, load the
-  `install-tools` skill â€” but Python is already installed here.
-- Quote URLs and queries (they contain `&`, `?`, spaces).
-
+## Workflow & rules
+1. Search to get candidate URLs.
+2. **Read** the best 1-2 (fetch/read tool, or `--fetch`) before stating any fact — snippets are short and can mislead.
+3. Cite the URL(s) you actually used.
+- If you get "no results" or a rate-limit, rephrase with fewer/more specific keywords and retry once.
+- For heavy/repeated searching, the plugin can be pointed at Tavily/SearXNG (see its settings) to avoid DuckDuckGo rate limits.

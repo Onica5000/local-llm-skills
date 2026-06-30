@@ -138,10 +138,16 @@ export default tool({
 
     if (hits.length === 0) {
       used = "duckduckgo";
-      try {
-        hits = await ddgHtml(args.query, max, ctx.abort);
-      } catch {
-        /* fall through to lite */
+      // retry with backoff to ride out transient DuckDuckGo rate-limits
+      for (let attempt = 0; attempt < 3 && hits.length === 0; attempt++) {
+        try {
+          hits = await ddgHtml(args.query, max, ctx.abort);
+        } catch {
+          /* retry, then fall through to lite */
+        }
+        if (hits.length === 0 && attempt < 2) {
+          await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)));
+        }
       }
     }
     if (hits.length === 0) {

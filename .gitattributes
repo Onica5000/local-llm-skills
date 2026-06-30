@@ -1,0 +1,10 @@
+# Normalize line endings; keep PowerShell as CRLF, treat assets as binary.
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.psm1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.gif binary
+*.png binary
+*.jpg binary
+*.pdf binary
